@@ -135,3 +135,6 @@ data/
 
 # vs code
 .vscode
+
+# dev config
+*_dev.cfg
