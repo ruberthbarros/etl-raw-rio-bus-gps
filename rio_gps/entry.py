@@ -71,7 +71,7 @@ def __process(config):
     )
 
     # Removes temp file
-    if file_path.isfile():
+    if file_path.is_file():
         file_path.unlink()
 
 
