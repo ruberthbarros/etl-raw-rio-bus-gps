@@ -1,13 +1,14 @@
-import logging
-import logging.config
 import argparse
 import configparser
+import logging
+import logging.config
 import traceback
-import request
-import persistence
 from datetime import datetime
+from os.path import isfile
 from pathlib import Path
 
+import persistence
+import request
 
 logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ def __process(config):
     now = datetime.now().strftime('%Y%m%d')
     object_name = f"{now}/{Path(file_path).name}"
 
-    logging.info("Uploads raw gps file to s3.")
+    logging.info(f"Uploading raw gps file to s3://{object_name}.")
     persistence.upload_file_to_s3(
         str(file_path),
         s3_bucket,
@@ -68,6 +69,10 @@ def __process(config):
         access_key_id=access_key_id,
         secret_access_key=secret_access_key
     )
+
+    # Removes temp file
+    if file_path.isfile():
+        file_path.unlink()
 
 
 if __name__ == '__main__':
