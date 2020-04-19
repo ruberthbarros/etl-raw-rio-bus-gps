@@ -1,7 +1,10 @@
+import logging
 from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.exceptions import Timeout
-from collect_rio_gps_data.domain import errors
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_gps_points(endpoint, max_retries=5, timeout=3):
@@ -28,7 +31,7 @@ def get_gps_points(endpoint, max_retries=5, timeout=3):
     json_data = response.json()
 
     if not json_data:
-        raise errors.EmptyResponseError()
+        raise Exception("Empty response from API.")
 
     return {
         "columns": list(map(str.lower, json_data["COLUMNS"])),

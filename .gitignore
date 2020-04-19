@@ -131,10 +131,12 @@ dmypy.json
 # data
 data/
 *.csv
-*.txt
 
 # vs code
 .vscode
 
 # dev config
 *_dev.cfg
+
+# logs directory
+logs/
