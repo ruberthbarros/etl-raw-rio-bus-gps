@@ -140,3 +140,5 @@ data/
 
 # logs directory
 logs/
+
+.DS_STORE
