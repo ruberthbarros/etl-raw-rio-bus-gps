@@ -64,7 +64,7 @@ def __process(config):
     persistence.upload_file_to_s3(
         str(file_path),
         s3_bucket,
-        object_name=,
+        object_name=object_name,
         access_key_id=access_key_id,
         secret_access_key=secret_access_key
     )
