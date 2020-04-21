@@ -3,6 +3,7 @@ import configparser
 import logging
 import logging.config
 import traceback
+import pytz
 from datetime import datetime
 from os.path import isfile
 from pathlib import Path
@@ -37,6 +38,7 @@ def __process(config):
         config (configparser.ConfigParser): project configuration expecting
         aws, request and io sections.
     """
+    local_tz = pytz.timezone(config.get("general", "timezone"))
     endpoint = config.get("request", "endpoint")
     max_retries = config.getint("request", "max_retries")
     timeout = config.getfloat("request", "timeout")
@@ -45,7 +47,9 @@ def __process(config):
     gps_data = request.get_gps_points(endpoint, max_retries, timeout)
 
     temp_dir = Path(config.get("io", "temp_data_dir"))
-    file_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+    date_now_tz = local_tz.localize(datetime.now())
+    date_now_str = datetime.strftime(date_now_tz, '%Y%m%d%H%M%S')
+    file_name = f"{date_now_str}.csv"
     file_path = temp_dir / file_name
 
     logging.info(f"Storing GPS points in {file_path}.")
@@ -58,8 +62,8 @@ def __process(config):
         secret_access_key = config.get("aws", "secret_access_key")
     s3_bucket = config.get("aws", "s3_bucket")
 
-    now = datetime.now().strftime('%Y%m%d')
-    object_name = f"{now}/{Path(file_path).name}"
+    date_now_str = datetime.strftime(date_now_tz, '%Y%m%d')
+    object_name = f"{date_now_str}/{Path(file_path).name}"
 
     logging.info(f"Uploading raw gps file to s3://{object_name}.")
     persistence.upload_file_to_s3(
