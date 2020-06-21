@@ -3,10 +3,12 @@ import configparser
 import logging
 import logging.config
 import traceback
-import pytz
 from datetime import datetime
 from os.path import isfile
 from pathlib import Path
+
+import pytz
+from dateutil.rrule import YEARLY
 
 import persistence
 import request
@@ -43,7 +45,7 @@ def __process(config):
     max_retries = config.getint("request", "max_retries")
     timeout = config.getfloat("request", "timeout")
 
-    logging.info("Getting GPS points from API.")
+    logging.info("Getting GPS points from {endpoint}.")
     gps_data = request.get_gps_points(endpoint, max_retries, timeout)
 
     temp_dir = Path(config.get("io", "temp_data_dir"))
@@ -62,8 +64,10 @@ def __process(config):
         secret_access_key = config.get("aws", "secret_access_key")
     s3_bucket = config.get("aws", "s3_bucket")
 
-    date_now_str = datetime.strftime(date_now_tz, '%Y%m%d')
-    object_name = f"{date_now_str}/{Path(file_path).name}"
+    year = datetime.strftime(date_now_tz, '%Y')
+    month = datetime.strftime(date_now_tz, '%Y%m')
+    day = datetime.strftime(date_now_tz, '%Y%m%d')
+    object_name = f"year={year}/month={month}/day={day}/{Path(file_path).name}"
 
     logging.info(f"Uploading raw gps file to s3://{object_name}.")
     persistence.upload_file_to_s3(
@@ -91,7 +95,7 @@ if __name__ == '__main__':
         logging.info("START PROCESS")
         __process(config)
     except Exception as exc:
-        # Captures any exception not captured inside functions.
+        # Top level general excception
         logging.exception(traceback.format_exc())
     finally:
         logging.info("END PROCESS")
