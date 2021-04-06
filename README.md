@@ -18,6 +18,7 @@ The script executes 4 main steps:
 2. Stores the GPS points in a temporary local file.
 3. Uploads the temporary local file to a given S3 bucket
 4. Delete the temporary file.
+5. Fazendo merda.
 
 ## Project Structure
 
